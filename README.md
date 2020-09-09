@@ -1,1 +1,0 @@
-# Kubernetes_in_ubuntu
