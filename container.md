@@ -14,6 +14,7 @@
 
 
 ### cgroup 이란
+------------------------------------------------
 1. cgroup 개요 
   - cgroups는 프로세스들의 자원의 사용을 제한하고 격리시키는 리눅스 커널 기능이다.
   
@@ -45,8 +46,53 @@
  ```
  
  ### ubuntu 에서 cgroup 으로 실습해보기
+------------------------------------------------
  1. 실습 환경 
   - Ubuntu 18.04.2 LTS
   
 2. 실습 목표 
   - cgroup-tools 이용해서 간단 실습 해보기
+  
+```
+1. cgroup tools 설치 
+  - sudo apt install cgroup-tools
+  
+2. 예제 설정 파일 복사
+  - cp /usr/share/doc/cgroup-tools/examples/cgred.conf /etc/
+  
+3. 설정 파일 생성
+/etc/cgconfig.conf
+==============================
+group web2 {
+cpu {
+         cpu.cfs_quota_us=10000;
+     }
+     memory {
+         memory.limit_in_bytes = 1024m;
+     }
+}
+==============================
+cpu.cfs_quota_us =  10000은 CPU 사용량 
+memory.limit_in_bytes = 1024는 시스템 메모리의 1G에 해당합니다.
+group web2 = web2 그룹 생성 
+
+4.룰 설정 파일 생성 
+/etc/cgrules.conf
+=============================
+# <user> <controllers> <destination> 
+web2 cpu, memory web2
+=============================
+사용자 web2의 모든 프로세스를 10 % CPU와 1G 메모리로 제한
+
+5.테스트 명령어 
+ - /usr/sbin/cgconfigparser -l /etc/cgconfig.conf
+ - /usr/sbin/cgrulesengd -vvv
+ 
+6. 동작 확인 
+  - cat /sys/fs/cgroup/cpu/web2/tasks 
+  - cat /sys/fs/cgroup/memory/web2/tasks 
+
+```
+
+  
+
